@@ -47,4 +47,4 @@ jobs:
           password: Rammandir@2021
           port: 65002
           source: .
-          target: public_html
+          target: public_html/public_html
