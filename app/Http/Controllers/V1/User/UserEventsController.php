@@ -39,7 +39,6 @@ class UserEventsController extends Controller
         $perPage = $validated['per_page'] ?? 5; // Default to 10 items per page
         $currentPage = $validated['page'] ?? 1; // Default to the first page
 
-
         $query = Event::query();
         // Get paginated events
         $events = $query->where('status', $eventStatusType) // Add this line to filter by status
