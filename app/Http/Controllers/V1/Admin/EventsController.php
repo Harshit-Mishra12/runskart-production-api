@@ -125,7 +125,8 @@ class EventsController extends Controller
                     'id' => $externalMatchId
                 ]);
 
-                if ($response->successful()) {
+                // if ($response->successful()) {
+                    if (false) {
                     $squadData = $response->json();
                     foreach ($squadData['data'] as $team) {
                         foreach ($team['players'] as $player) {
