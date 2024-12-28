@@ -156,6 +156,9 @@ class EventsController extends Controller
                                 ]);
                             }
                         }
+                        $match->update([
+                            'is_squad_announced' => true
+                        ]);
                     }
                 }
             }
