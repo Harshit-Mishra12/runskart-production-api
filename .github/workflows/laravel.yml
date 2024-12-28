@@ -47,5 +47,5 @@ jobs:
           password: Rammandir@2021
           port: 65002
           source: .
-          target: public_html/runskart
+          target: /home/u572080122/domains/paleturquoise-crab-208767.hostingersite.com/public_html/runskart
 
