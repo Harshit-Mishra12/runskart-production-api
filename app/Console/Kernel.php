@@ -46,9 +46,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('update:team-points')->everyThreeMinutes();
         $schedule->command('update:match-squad')->everyFiveMinutes();
         $schedule->command('events:set-ranks-credit-winnings')->everyFiveMinutes();
+        $schedule->command('events:set-ranks')->everyThreeMinutes();
         // $schedule->command('update:team-points-test')->everyThreeMinutes();
-
-
     }
 
     /**
