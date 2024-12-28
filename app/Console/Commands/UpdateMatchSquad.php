@@ -26,7 +26,11 @@ class UpdateMatchSquad extends Command
     public function handle()
     {
         // Fetch all upcoming events
-        $upcomingEvents = Event::where('status', 'UPCOMING')->get();
+        // $upcomingEvents = Event::where('status', 'UPCOMING')->get();
+        $upcomingEvents = Event::where('status', 'UPCOMING')
+                        ->where('id', 7)
+                        ->get();
+
         Log::info('UpdateMatchSquad job started.');
         $this->info("UpdateMatchSquad job started.");
         $apiKey = Helper::getApiKey(); // Assume you have a helper function to get API key
@@ -58,8 +62,9 @@ class UpdateMatchSquad extends Command
                             $squadData = $response->json();
 
                             // if ($squadData && isset($squadData['data'])) {
-                                $this->info("check matchsquad harshit {count($squadData)}.");
-                                if ($squadData && is_array($squadData) && count($squadData) === 2 && isset($squadData['data'])) {
+                                $this->info("check matchsquad harshit " . count($squadData['data']) . ".");
+
+                                if ($squadData && is_array($squadData) && count($squadData['data']) === 2 && isset($squadData['data'])) {
                                 DB::beginTransaction();
                                 try {
                                     // Process and store match player data
@@ -115,6 +120,9 @@ class UpdateMatchSquad extends Command
                     } else {
                         $this->error("Failed to fetch squad data for match ID: {$match->id}");
                     }
+                }
+                else{
+                    $this->info("UpdateMatchSquad already announced.");
                 }
             }
         }
