@@ -57,7 +57,8 @@ class UpdateMatchSquad extends Command
 
                             $squadData = $response->json();
 
-                            if ($squadData && isset($squadData['data'])) {
+                            // if ($squadData && isset($squadData['data'])) {
+                                if ($squadData && is_array($squadData) && count($squadData) === 2 && isset($squadData['data'])) {
                                 DB::beginTransaction();
                                 try {
                                     // Process and store match player data
