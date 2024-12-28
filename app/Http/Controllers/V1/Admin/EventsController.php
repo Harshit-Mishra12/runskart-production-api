@@ -125,34 +125,36 @@ class EventsController extends Controller
                     'id' => $externalMatchId
                 ]);
 
-                // if ($response->successful()) {
-                    if (false) {
+                if ($response->successful()) {
+                    // if (false) {
                     $squadData = $response->json();
-                    foreach ($squadData['data'] as $team) {
-                        foreach ($team['players'] as $player) {
-                            $roleString = strtolower(trim($player['role']));
-                            $role = 'unknown';
-                            if (stripos($roleString, 'wk-batsman') !== false) {
-                                $role = 'wicketkeeper';
-                            } elseif (stripos($roleString, 'batting allrounder') !== false || stripos($roleString, 'bowling allrounder') !== false) {
-                                $role = 'allrounder';
-                            } elseif (stripos($roleString, 'batsman') !== false && stripos($roleString, 'wk') === false) {
-                                $role = 'batsman';
-                            } elseif (stripos($roleString, 'bowler') !== false) {
-                                $role = 'bowler';
-                            }
+                    if ($squadData && is_array($squadData) && count($squadData['data']) === 2 && isset($squadData['data'])) {
+                        foreach ($squadData['data'] as $team) {
+                            foreach ($team['players'] as $player) {
+                                $roleString = strtolower(trim($player['role']));
+                                $role = 'unknown';
+                                if (stripos($roleString, 'wk-batsman') !== false) {
+                                    $role = 'wicketkeeper';
+                                } elseif (stripos($roleString, 'batting allrounder') !== false || stripos($roleString, 'bowling allrounder') !== false) {
+                                    $role = 'allrounder';
+                                } elseif (stripos($roleString, 'batsman') !== false && stripos($roleString, 'wk') === false) {
+                                    $role = 'batsman';
+                                } elseif (stripos($roleString, 'bowler') !== false) {
+                                    $role = 'bowler';
+                                }
 
-                            MatchPlayer::create([
-                                'match_id' => $match->id,
-                                'event_id' => $event->id,
-                                'external_player_id' => $player['id'],
-                                'name' => $player['name'],
-                                'role' => $role,
-                                'country' => $player['country'],
-                                'team' => $team['teamName'] ?? 'Unknown',
-                                'image_url' => $player['playerImg'],
-                                'status' => 'UNANNOUNCED'
-                            ]);
+                                MatchPlayer::create([
+                                    'match_id' => $match->id,
+                                    'event_id' => $event->id,
+                                    'external_player_id' => $player['id'],
+                                    'name' => $player['name'],
+                                    'role' => $role,
+                                    'country' => $player['country'],
+                                    'team' => $team['teamName'] ?? 'Unknown',
+                                    'image_url' => $player['playerImg'],
+                                    'status' => 'UNANNOUNCED'
+                                ]);
+                            }
                         }
                     }
                 }
