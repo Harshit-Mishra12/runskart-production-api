@@ -58,6 +58,7 @@ class UpdateMatchSquad extends Command
                             $squadData = $response->json();
 
                             // if ($squadData && isset($squadData['data'])) {
+                                $this->info("check matchsquad harshit {count($squadData)}.");
                                 if ($squadData && is_array($squadData) && count($squadData) === 2 && isset($squadData['data'])) {
                                 DB::beginTransaction();
                                 try {
