@@ -227,6 +227,7 @@ class UserController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'status_message' => 'nullable|string',
+            'status' => 'string',
         ]);
 
         // Find the user by ID
@@ -238,15 +239,15 @@ class UserController extends Controller
                 'message' => 'User not found.'
             ]);
         }
-
+        $user->doc_status = $request->status;
         // Toggle the user's doc_status
-        if ($user->doc_status === 'PENDING') {
-            $user->doc_status = 'VERIFIED';
-        } elseif ($user->doc_status === 'VERIFIED') {
-            $user->doc_status = 'UNVERIFIED';
-        } elseif ($user->doc_status === 'UNVERIFIED') {
-            $user->doc_status = 'VERIFIED';
-        }
+        // if ($user->doc_status === 'PENDING') {
+        //     $user->doc_status = 'VERIFIED';
+        // } elseif ($user->doc_status === 'VERIFIED') {
+        //     $user->doc_status = 'UNVERIFIED';
+        // } elseif ($user->doc_status === 'UNVERIFIED') {
+        //     $user->doc_status = 'VERIFIED';
+        // }
 
         // Optionally, store the status message if you have a column for it
         $user->status_message = $request->status_message; // Ensure the `status_message` column exists in the users table
