@@ -50,54 +50,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    // public function updateProfile(Request $request)
-    // {
-    //     // Validate the request
-    //     $request->validate([
-    //         'profile_picture' => 'nullable|mimes:jpeg,jpg,png|max:2048',
-    //         'account_name' => 'nullable|string',
-    //         'account_number' => 'nullable|string|unique:user_bank_details,account_number',
-    //         'ifsc_code' => 'nullable|string',
-    //     ]);
 
-    //     $user = auth()->user();
-    //     if (!$user) {
-    //         return response()->json(['status_code' => 2, 'message' => 'User not found.']);
-    //     }
-
-    //     // Handle profile picture upload
-    //     $updateData = [];
-
-    //     // Handle profile picture upload
-    //     if ($request->hasFile('profile_picture')) {
-    //         $file = $request->file('profile_picture');
-    //         $profilePicturePath = Helper::saveImageToServer($file, 'uploads/profile/');
-    //         $updateData['profile_picture'] = $profilePicturePath;
-    //     }
-    //     User::where('id', $user->id)->update($updateData);
-
-    //     // Use UserBankDetails directly
-    //     $bankDetails = UserBankDetails::where('user_id', $user->id)->first();
-
-    //     // If bank details exist, update; otherwise, create new record
-    //     if ($bankDetails) {
-    //         $bankDetails->update([
-    //             'account_name' => $request->input('account_name'),
-    //             'account_number' => $request->input('account_number'),
-    //             'ifsc_code' => $request->input('ifsc_code'),
-    //         ]);
-    //     } else {
-    //         // Create new bank details
-    //         UserBankDetails::create([
-    //             'user_id' => $user->id,
-    //             'account_name' => $request->input('account_name'),
-    //             'account_number' => $request->input('account_number'),
-    //             'ifsc_code' => $request->input('ifsc_code'),
-    //         ]);
-    //     }
-
-    //     return response()->json(['status_code' => 1, 'message' => 'Profile updated successfully.']);
-    // }
 
     public function updateProfile(Request $request)
     {
@@ -213,14 +166,7 @@ class ProfileController extends Controller
         $bankDetails->account_number = $validated['account_number'];
         $bankDetails->ifsc_code = $validated['ifsc_code'];
         $bankDetails->save();
-
-        // Update the user to mark bank details as verified
-        // $user->is_bank_details_verified = 1;
-        // $user->save();
-
         User::where('id', $user->id)->update(['is_bank_details_verified' => true]);
-
-
         return response()->json([
             'status_code' => 1,
             'message' => 'Bank details updated and verified successfully.',
