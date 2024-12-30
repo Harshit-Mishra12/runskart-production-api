@@ -15,7 +15,7 @@ class SetTeamRanks extends Command
     {
         $liveEvents = Event::where('status', 'LIVE')
             ->where('is_winning_amount_transacted', false)
-            ->whereIn('id', [2])
+            // ->whereIn('id', [2])
             ->get();
 
             $this->info("set team rank cron job");
