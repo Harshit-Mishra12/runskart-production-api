@@ -26,10 +26,8 @@ class UpdateMatchSquad extends Command
     public function handle()
     {
         // Fetch all upcoming events
-        // $upcomingEvents = Event::where('status', 'UPCOMING')->get();
-        $upcomingEvents = Event::where('status', 'UPCOMING')
-                        ->where('id', 7)
-                        ->get();
+        $upcomingEvents = Event::where('status', 'UPCOMING')->get();
+
 
         Log::info('UpdateMatchSquad job started.');
         $this->info("UpdateMatchSquad job started.");
