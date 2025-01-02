@@ -1163,37 +1163,31 @@ class EventsController extends Controller
         ]);
     }
 
-    public function getTeamsByEvent($event_id)
+    public function getTeamsPrizeAmountByEvent(Request $request)
     {
-        // Fetch teams for the given event_id including user info and rank
-        $teams = Team::where('event_id', $event_id)
-        ->whereHas('user', function ($query) {
-            $query->where('role', 'USER'); // Filter for users with role 'USER'
-        })
-        ->with([
-            'user:id,name', // Select specific fields from the user table
-            'userTransaction' => function ($query) {
+        // Fetch event_id from the request
+        $event_id = $request->input('event_id');
+
+        // Fetch pagination parameters from the request
+        $perPage = $request->input('per_page', 10); // Default to 10 teams per page
+        $page = $request->input('page', 1); // Default to page 1
+
+        // Fetch teams for the given event_id and apply sorting and filtering
+        $teamsQuery = Team::where('event_id', $event_id)
+            ->with(['user:id,name', 'userTransaction' => function ($query) {
                 $query->select('team_id', 'amount', 'transaction_id')
                     ->where('transaction_type', 'credit'); // Filter for credit transactions only
-            }
-        ])
-        ->get();
+            }])
+            ->whereHas('userTransaction', function ($query) {
+                $query->where('amount', '>', 0); // Include only teams with prize amount > 0
+            })
+            ->orderBy('rank', 'asc'); // Sort by rank in ascending order
 
+        // Paginate the filtered and sorted query
+        $paginatedTeams = $teamsQuery->paginate($perPage, ['*'], 'page', $page);
 
-
-
-
-        // Check if any teams are found
-        if ($teams->isEmpty()) {
-            return response()->json([
-                'status_code' => 2,
-                'message' => 'No teams found for this event.',
-            ]);
-        }
-
-        // Map teams with additional info
-        $teams = $teams->map(function ($team) {
-            // Check if the team has a user transaction for prize amount
+        // Map teams with additional info while keeping pagination metadata intact
+        $teams = $paginatedTeams->getCollection()->map(function ($team) {
             $prize = $team->userTransaction ? $team->userTransaction->amount : 0;
             $transactionId = $team->userTransaction ? $team->userTransaction->transaction_id : null;
 
@@ -1207,11 +1201,82 @@ class EventsController extends Controller
             ];
         });
 
-        // Return the list of teams with their details
+        // Replace the original collection with the mapped one
+        $paginatedTeams->setCollection($teams);
+
+        // Return the paginated list of teams with their details
         return response()->json([
             'status_code' => 1,
             'message' => 'Teams and players retrieved successfully.',
-            'teams' => $teams,
+            'teams' => $paginatedTeams->items(), // Data for the current page
+            'pagination' => [
+                'total' => $paginatedTeams->total(),
+                'per_page' => $paginatedTeams->perPage(),
+                'current_page' => $paginatedTeams->currentPage(),
+                'last_page' => $paginatedTeams->lastPage(),
+                'from' => $paginatedTeams->firstItem(),
+                'to' => $paginatedTeams->lastItem(),
+            ],
+        ]);
+    }
+    public function getAllTeamsForAnEvent(Request $request)
+    {
+        // Get the authenticated user's ID
+        $user_id = auth()->user()->id;
+
+        // Extract the event_id and pagination parameters from the request
+        $event_id = $request->input('event_id'); // Fetch event_id from the request
+        $perPage = $request->input('per_page', 10); // Default to 10 teams per page if not provided
+        $page = $request->input('page', 1); // Default to page 1 if not provided
+
+        // Ensure event_id is present in the request
+        if (!$event_id) {
+            return response()->json([
+                'status_code' => 2,
+                'message' => 'Event ID is required.',
+            ]);
+        }
+
+        // Fetch teams for the given event_id and sort by points_scored in descending order
+        // Join the users table to get the user name for each team
+        // Apply pagination with dynamic per_page and page values
+        $teams = Team::where('event_id', $event_id)
+            ->leftJoin('users', 'teams.user_id', '=', 'users.id') // Join with users table to get user name
+            ->select('teams.*', 'users.name as user_name') // Select all fields from teams and the name field from users
+            ->orderBy('points_scored', 'desc') // Sort teams by points_scored
+            ->paginate($perPage, ['*'], 'page', $page); // Apply pagination, page and per_page
+
+        // Check if any teams are found
+        if ($teams->isEmpty()) {
+            return response()->json([
+                'status_code' => 2,
+                'message' => 'No teams found for this event.',
+            ]);
+        }
+
+        // Fetch players for each team using the getPlayersByTeam logic and add isMy flag, rank, and user_name
+        $teamsWithPlayers = $teams->map(function ($team, $index) use ($user_id) {
+            // Check if the current team belongs to the authenticated user
+            $isMyTeam = ($team->user_id === $user_id);
+
+            // Add isMy and user_name to the response
+            return [
+                'team' => $team,
+                'isMy' => $isMyTeam, // Indicate if the team belongs to the authenticated user
+            ];
+        });
+
+        // Return the paginated list of teams with their players, isMy flag, and rank inside team
+        return response()->json([
+            'status_code' => 1,
+            'message' => 'Teams and players retrieved successfully.',
+            'teams' => $teamsWithPlayers,
+            'pagination' => [
+                'current_page' => $teams->currentPage(),
+                'per_page' => $teams->perPage(),
+                'total' => $teams->total(),
+                'last_page' => $teams->lastPage(),
+            ],
         ]);
     }
 }

@@ -58,17 +58,13 @@ Route::prefix('v1')->group(function () {
             Route::post("/events/user/data", [EventsController::class, 'randomUserData']);
             Route::get("/events/teams/prize-amount/{eventId}", [EventsController::class, 'getTeamsByEvent']);
 
-
+             //event details tab
+            Route::post("/events/details/teams/prize-amount", [EventsController::class, 'getTeamsPrizeAmountByEvent']);
+            Route::post("/events/details/all/team", [EventsController::class, 'getAllTeamsForAnEvent']);
 
 
             Route::post("/transactions/fetch", [TransactionController::class, 'getAllUserTransactions']);
             Route::post("/transactions/status/update", [TransactionController::class, 'updateTransactionStatus']);
-
-
-
-
-
-
             //cricket api
             Route::post('/events/fetch-matches/external', [CricketExternalController::class, 'fetchMatches']);
             //dashboard
@@ -87,9 +83,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/users/changeverificationdocstatus', [UserController::class, 'changeVerificationStatus']);
             Route::post('/users/changestatus', [UserController::class, 'toggleUserStatus']);
             Route::post('/uploadTermsAndConditions', [TermsAndConditionController::class, 'uploadTermsAndConditions']);
-
-
-
         });
 
         Route::prefix('user')->group(function () {
@@ -110,8 +103,10 @@ Route::prefix('v1')->group(function () {
             Route::post("/events/team/update", [UserEventsController::class, 'updateTeam']);
             Route::get("/events/team/{eventId}", [UserEventsController::class, 'getTeamsByEvent']);
             Route::get("/events/all/team/{eventId}", [UserEventsController::class, 'getAllTeamsByEvent']);
-            Route::get("/events/all/user-team/{userId}", [UserEventsController::class, 'getAllTeamsByUser']);
 
+
+
+            Route::get("/events/all/user-team/{userId}", [UserEventsController::class, 'getAllTeamsByUser']);
             Route::get("/events/team/players/{teamId}", [UserEventsController::class, 'getPlayersByTeam']);
             Route::get("/events/fetch/{eventId}", [UserEventsController::class, 'getEventDetailsById']);
 
@@ -119,10 +114,6 @@ Route::prefix('v1')->group(function () {
             Route::get("/events/fetch/matchinfo/{eventId}", [UserEventsController::class, 'getEventMatchesScorecard']);
 
             Route::get("/events/fetch/teams/userTransactionDetails/{eventId}", [UserEventsController::class, 'getTeamsTransactionDetails']);
-
-
-
-
             //transaction
 
             Route::post("/wallet/transaction", [WalletController::class, 'addFunds']);
@@ -139,7 +130,6 @@ Route::prefix('v1')->group(function () {
             Route::post("/profile/update", [ProfileController::class, 'updateProfile']);
             Route::get("/faq/fetch", [FAQController::class, 'fetchFaqList']);
             Route::post("/profile/bank-details/update", [ProfileController::class, 'updateBankDetails']);
-
         });
 
         Route::prefix('retailer')->group(function () {});
