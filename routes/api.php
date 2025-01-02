@@ -5,6 +5,7 @@ use App\Http\Controllers\V1\Admin\DashboardController;
 use App\Http\Controllers\V1\Admin\CricketExternalController;
 use App\Http\Controllers\V1\User\UserCricketExternalController;
 use App\Http\Controllers\V1\Admin\FAQController;
+use App\Http\Controllers\V1\Admin\RulesController;
 use App\Http\Controllers\V1\Admin\UserController;
 use App\Http\Controllers\V1\Admin\TermsAndConditionController;
 use App\Http\Controllers\V1\User\UserEventsController;
@@ -40,6 +41,7 @@ Route::prefix('v1')->group(function () {
     Route::post("/auth/bank-account/verify", [AuthController::class, 'verifyBankAccount']);
     Route::post('/wallet/verify-payment', [WalletController::class, 'verifyPayment']);
     Route::get('/fetchTermsAndConditions', [TermsAndConditionController::class, 'fetchTermsAndConditions']);
+    Route::get('/fetchRules', [RulesController::class, 'fetchRules']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('admin')->group(function () {
             //events
@@ -83,6 +85,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/users/changeverificationdocstatus', [UserController::class, 'changeVerificationStatus']);
             Route::post('/users/changestatus', [UserController::class, 'toggleUserStatus']);
             Route::post('/uploadTermsAndConditions', [TermsAndConditionController::class, 'uploadTermsAndConditions']);
+            Route::post('/uploadRules', [RulesController::class, 'uploadRules']);
+
+
         });
 
         Route::prefix('user')->group(function () {
