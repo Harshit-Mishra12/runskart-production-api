@@ -1167,11 +1167,21 @@ class EventsController extends Controller
     {
         // Fetch teams for the given event_id including user info and rank
         $teams = Team::where('event_id', $event_id)
-            ->with(['user:id,name', 'userTransaction' => function ($query) {
+        ->whereHas('user', function ($query) {
+            $query->where('role', 'USER'); // Filter for users with role 'USER'
+        })
+        ->with([
+            'user:id,name', // Select specific fields from the user table
+            'userTransaction' => function ($query) {
                 $query->select('team_id', 'amount', 'transaction_id')
                     ->where('transaction_type', 'credit'); // Filter for credit transactions only
-            }])
-            ->get();
+            }
+        ])
+        ->get();
+
+
+
+
 
         // Check if any teams are found
         if ($teams->isEmpty()) {
