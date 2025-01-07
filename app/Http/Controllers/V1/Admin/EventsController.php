@@ -1024,6 +1024,19 @@ class EventsController extends Controller
         $page = $request->input('page', 1); // Default to page 1
 
         // Fetch teams for the given event_id and apply sorting and filtering
+        // $teamsQuery = Team::where('event_id', $event_id)
+        //     ->with(['user:id,name,role', 'userTransaction' => function ($query) {
+        //         $query->select('team_id', 'amount', 'transaction_id')
+        //             ->where('transaction_type', 'credit'); // Filter for credit transactions only
+        //     }])
+        //     ->whereHas('userTransaction', function ($query) {
+        //         $query->where('amount', '>', 0); // Include only teams with prize amount > 0
+        //     })
+        //     ->join('users', 'teams.user_id', '=', 'users.id') // Join the users table
+        //     ->orderByRaw("FIELD(users.role, 'USER') DESC") // Prioritize 'USER' roles from the users table
+        //     ->orderBy('rank', 'asc') // Then sort by rank
+        //     ->select('teams.*'); // Ensure only columns from the teams table are selected
+
         $teamsQuery = Team::where('event_id', $event_id)
             ->with(['user:id,name,role', 'userTransaction' => function ($query) {
                 $query->select('team_id', 'amount', 'transaction_id')
@@ -1032,6 +1045,7 @@ class EventsController extends Controller
             ->whereHas('userTransaction', function ($query) {
                 $query->where('amount', '>', 0); // Include only teams with prize amount > 0
             })
+
             ->orderBy('rank', 'asc'); // Sort by rank in ascending order
 
         // Paginate the filtered and sorted query
