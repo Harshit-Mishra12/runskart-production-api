@@ -27,7 +27,7 @@ class CreateRandomTeam extends Command
     {
 
         $events = Event::where('status', 'LIVE')
-            ->where('active', true) // Ensures 'active' is true
+            // ->where('active', true) // Ensures 'active' is true
             ->where('activate_status', 'ACTIVE') // Ensures 'activate_status' is 'ACTIVE'
             ->get();
 
