@@ -19,10 +19,12 @@ class SetTeamRanksAndCreditWinnings extends Command
     public function handle()
     {
         // Get the current date to find completed events
-        //$completedEvents = Event::where('status', 'COMPLETED')->where('id', 290)->get();
+
+
         // $completedEvents = Event::where('status', 'COMPLETED')
-        //     ->where('is_winning_amount_transacted', false)
+        //     ->where('is_winning_amount_transacted', false)// Adding the condition for activate_status
         //     ->get();
+
         $completedEvents = Event::where('status', 'COMPLETED')
             ->where('is_winning_amount_transacted', false)
             // ->whereIn('id', [296])
@@ -149,42 +151,7 @@ class SetTeamRanksAndCreditWinnings extends Command
 
                         // Skip further processing for `other_rank` type as it's already handled
                         continue;
-
                     }
-
-                    // Process transactions for teams for `top_rank` or other eligible types
-                    // foreach ($teamIds as $teamId) {
-                    //     // Find the team to credit the user
-                    //     $team = Team::find($teamId);
-                    //     if ($team) {
-                    //         $existingTransaction = UserTransaction::where('user_id', $team->user_id)
-                    //             ->where('team_id', $teamId)
-                    //             ->where('description', 'like', "Prize credited for event name: {$event->name}%")
-                    //             ->first();
-
-                    //         if (!$existingTransaction) {
-                    //             // No previous transaction, create a new one
-                    //             UserTransaction::create([
-                    //                 'user_id' => $team->user_id,
-                    //                 'team_id' => $teamId,
-                    //                 'amount' => $prizePerTeam, // Prize per team
-                    //                 'status' => 'COMPLETED',
-                    //                 'transaction_type' => 'credit',
-                    //                 'description' => "Prize credited for event name: {$event->name}, Rank: {$rank}",
-                    //                 'transaction_id' => Str::uuid(), // Generate a unique transaction ID
-                    //             ]);
-
-                    //             // Update the user's wallet balance
-                    //             $userWallet = UserWallet::firstOrCreate(['user_id' => $team->user_id]);
-                    //             $userWallet->balance += $prizePerTeam;
-                    //             $userWallet->save();
-
-                    //             $this->info("Team ID: {$teamId}, Event ID: {$event->id}, Rank: {$rank}, Prize: {$prizePerTeam} credited to user ID: {$team->user_id}");
-                    //         } else {
-                    //             $this->info("Prize already credited for Team ID: {$teamId}, Event ID: {$event->id}, Rank: {$rank} for user ID: {$team->user_id}");
-                    //         }
-                    //     }
-                    // }
                 }
             }
 
