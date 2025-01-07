@@ -1025,7 +1025,7 @@ class EventsController extends Controller
 
         // Fetch teams for the given event_id and apply sorting and filtering
         $teamsQuery = Team::where('event_id', $event_id)
-            ->with(['user:id,name', 'userTransaction' => function ($query) {
+            ->with(['user:id,name,role', 'userTransaction' => function ($query) {
                 $query->select('team_id', 'amount', 'transaction_id')
                     ->where('transaction_type', 'credit'); // Filter for credit transactions only
             }])
@@ -1049,6 +1049,7 @@ class EventsController extends Controller
                 'rank' => $team->rank,
                 'prize_amount' => $prize,
                 'transaction_id' => $transactionId,
+                'user_role' => $team->user->role,
             ];
         });
 
