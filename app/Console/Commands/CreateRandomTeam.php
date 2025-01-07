@@ -27,7 +27,10 @@ class CreateRandomTeam extends Command
     {
 
         $events = Event::where('status', 'LIVE')
-            ->get(); // Fetch all upcoming events
+            ->where('active', true) // Ensures 'active' is true
+            ->where('activate_status', 'ACTIVE') // Ensures 'activate_status' is 'ACTIVE'
+            ->get();
+
         Log::info('CreateRandomTeam job started.');
         $this->info("CreateRandomTeam job started.");
         // Fetch a specific event for testing

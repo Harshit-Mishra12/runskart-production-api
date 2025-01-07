@@ -27,7 +27,8 @@ class Event extends Model
         'user_participation_limit',
         'team_limit_per_user',
         'winners_limit',
-        'status'
+        'status',
+
     ];
 
     /**

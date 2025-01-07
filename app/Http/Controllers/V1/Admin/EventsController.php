@@ -186,158 +186,7 @@ class EventsController extends Controller
         }
     }
 
-    // public function createEvent(Request $request)
-    // {
-    //     // Validate the request
-    //     $validatedData = $request->validate([
-    //         // 'name' => 'required|string|max:255|unique:events,name',
-    //         'name' => 'required',
-    //         'go_live_date' => 'required|date_format:Y-m-d',
-    //         'team_size' => 'required|integer|min:1',
-    //         'batsman_limit' => 'required|integer|min:0',
-    //         'bowler_limit' => 'required|integer|min:0',
-    //         'wicketkeeper_limit' => 'required|integer|min:0',
-    //         'all_rounder_limit' => 'required|integer|min:0',
-    //         'team_creation_cost' => 'required|numeric|min:0',
-    //         'user_participation_limit' => 'required|integer|min:0',
-    //         'winners_limit' => 'required|integer|min:1',
-    //         'prizes' => 'required|array',
-    //         'other_prizes' => 'required',
-    //         'prizes.*.rank' => 'required|integer',
-    //         'prizes.*.prize_amount' => 'required|numeric|min:0',
-    //         'matches' => 'required|array',
-    //         'team_limit_per_user' => 'required'
-    //     ]);
 
-    //     DB::beginTransaction();
-
-    //     try {
-    //         // Create the event
-    //         $event = Event::create([
-    //             'name' => $request->input('name'),
-    //             'go_live_date' => $request->input('go_live_date'),
-    //             'team_size' => $request->input('team_size'),
-    //             'batsman_limit' => $request->input('batsman_limit'),
-    //             'bowler_limit' => $request->input('bowler_limit'),
-    //             'wicketkeeper_limit' => $request->input('wicketkeeper_limit'),
-    //             'all_rounder_limit' => $request->input('all_rounder_limit'),
-    //             'team_creation_cost' => $request->input('team_creation_cost'),
-    //             'user_participation_limit' => $request->input('user_participation_limit'),
-    //             'winners_limit' => $request->input('winners_limit'),
-    //             'team_limit_per_user' => $request->input('team_limit_per_user'),
-    //             'status' => 'CREATED'
-    //         ]);
-
-    //         // Handle prizes
-    //         $prizes = $request->input('prizes');
-    //         foreach ($prizes as $index => $prize) {
-    //             if (isset($prize['rank']) && isset($prize['prize_amount'])) {
-    //                 $rankFrom = $prize['rank'];
-    //                 EventPrize::create([
-    //                     'event_id' => $event->id,
-    //                     'rank_from' => $rankFrom,
-    //                     'rank_to' => $rankFrom,
-    //                     'prize_amount' => $prize['prize_amount'],
-    //                     'type' => 'top_rank'
-    //                 ]);
-    //             }
-    //         }
-
-    //         EventPrize::create([
-    //             'event_id' => $event->id,
-    //             'rank_from' => count($prizes) + 1,
-    //             'rank_to' => $request->input('winners_limit'),
-    //             'prize_amount' => $request->input('other_prizes'),
-    //             'type' => 'other_rank'
-    //         ]);
-
-    //         // Add matches and process squad data
-    //         $matches = $request->input('matches');
-    //         $apiKey = Helper::getApiKey();
-
-    //         foreach ($matches as $matchData) {
-
-    //             $match = Matches::create([
-    //                 'external_match_id' => $matchData['id'],
-    //                 'team1' => $matchData['teams'][0],
-    //                 'team2' => $matchData['teams'][1],
-    //                 'team1_url' => isset($matchData['teamInfo'][0]["img"]) ? $matchData['teamInfo'][0]["img"] : null, // Check if 'teamInfo' exists
-    //                 'team2_url' => isset($matchData['teamInfo'][1]["img"]) ? $matchData['teamInfo'][1]["img"] : null, // Check if 'teamInfo' exists
-    //                 'date_time' => $matchData['dateTime'],
-    //                 'venue' => $matchData['venue'],
-    //                 'status' => $matchData['status'],
-    //                 'is_squad_announced' => $matchData['hasSquad']
-    //             ]);
-
-
-
-    //             // Link the match to the event
-    //             EventMatch::create([
-    //                 'event_id' => $event->id,
-    //                 'match_id' => $match->id
-    //             ]);
-
-    //             // Fetch squad data using external_match_id
-    //             $externalMatchId = $match->external_match_id;
-    //             $response = Http::get("https://api.cricapi.com/v1/match_squad", [
-    //                 'apikey' => $apiKey,
-    //                 'id' => $externalMatchId
-    //             ]);
-
-    //             if ($response->successful()) {
-    //                 $squadData = $response->json();
-
-    //                 // Process and store match player data
-    //                 foreach ($squadData['data'] as $team) {
-    //                     foreach ($team['players'] as $player) {
-    //                         $roleString = strtolower(trim($player['role'])); // Ensure lowercase and trimmed string
-
-    //                         // Check for specific role cases
-    //                         if (stripos($roleString, 'wk-batsman') !== false) {
-    //                             $role = 'wicketkeeper';
-    //                         } elseif (stripos($roleString, 'batting allrounder') !== false || stripos($roleString, 'bowling allrounder') !== false) {
-    //                             $role = 'allrounder';
-    //                         } elseif (stripos($roleString, 'batsman') !== false && stripos($roleString, 'wk') === false) {
-    //                             $role = 'batsman';
-    //                         } elseif (stripos($roleString, 'bowler') !== false) {
-    //                             $role = 'bowler';
-    //                         } else {
-    //                             $role = 'unknown'; // Default to unknown if no match found
-    //                         }
-    //                         MatchPlayer::create([
-    //                             'match_id' => $match->id,
-    //                             'event_id' => $event->id,
-    //                             'external_player_id' => $player['id'],
-    //                             'name' => $player['name'],
-    //                             'role' =>   $role,
-    //                             'country' => $player['country'],
-    //                             'team' => isset($team['teamName']) ? $team['teamName'] : 'Unknown',
-    //                             'image_url' => $player['playerImg'],
-    //                             'status' => "UNANNOUNCED"
-    //                         ]);
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         DB::commit();
-
-    //         return response()->json([
-    //             'status_code' => 1,
-    //             'message' => 'Event and match squad created successfully',
-    //             'data' => ['event' => $event],
-    //         ]);
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-
-    //         // Handle exception
-    //         return response()->json([
-    //             'status_code' => 2,
-    //             'message' => 'Error creating event or fetching squad data',
-    //             'error' => $e->getMessage()
-    //         ]);
-    //     }
-    // }
 
     public function updateEvent(Request $request)
     {
@@ -403,7 +252,8 @@ class EventsController extends Controller
                         'event_id' => $event->id,
                         'rank_from' => $prize['rank_from'],
                         'rank_to' => $prize['rank_to'],
-                        'prize_amount' => $prize['prize_amount']
+                        'prize_amount' => $prize['prize_amount'],
+                        'type' => 'top_rank'
                     ]);
                 }
             }
@@ -413,7 +263,8 @@ class EventsController extends Controller
                 'event_id' => $event->id,
                 'rank_from' => count($prizes) + 1,
                 'rank_to' => $request->input('winners_limit'),
-                'prize_amount' => $request->input('other_prizes')
+                'prize_amount' => $request->input('other_prizes'),
+                'type' => 'other_rank'
             ]);
 
             DB::commit();
