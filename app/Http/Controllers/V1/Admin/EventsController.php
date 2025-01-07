@@ -102,8 +102,8 @@ class EventsController extends Controller
                     'team2_url' => $matchData['teamInfo'][1]["img"] ?? null,
                     'date_time' => $matchData['dateTime'],
                     'venue' => $matchData['venue'],
-                    'status' => $matchData['status'],
-                    'is_squad_announced' => $matchData['hasSquad']
+                    'status' => $matchData['status']
+                    // 'is_squad_announced' => $matchData['hasSquad']
                 ]);
 
                 // Link the match to the event
