@@ -8,7 +8,9 @@ use App\Models\Faq;
 use App\Models\User;
 use App\Models\UserBankDetails;
 use App\Models\UserTransaction;
+use App\Models\UserWallet;
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 
@@ -90,6 +92,7 @@ class TransactionController extends Controller
         $validated = $request->validate([
             'id' => 'required|integer|exists:user_transactions,id', // Changed to 'id'
             'user_id' => 'required|integer|exists:users,id',
+            ''
         ]);
 
         // Find the transaction
@@ -112,6 +115,66 @@ class TransactionController extends Controller
         return response()->json([
             'status_code' => 1,
             'message' => 'Transaction status updated to COMPLETED successfully.',
+            'data' => $transaction,
+        ]);
+    }
+
+    public function rejectTransactionStatus(Request $request)
+    {
+        // Validate the input
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:user_transactions,id',
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
+
+        // Find the transaction
+        $transaction = UserTransaction::where('id', $validated['id']) // Use the primary key
+            ->where('user_id', $validated['user_id'])
+            ->first();
+
+        // Check if transaction exists
+        if (!$transaction) {
+            return response()->json([
+                'status_code' => 0,
+                'message' => 'Transaction not found for the given user.',
+            ], 404);
+        }
+
+        // Update the transaction status to 'REJECTED'
+        $transaction->status = 'REJECTED';
+        $transaction->save();
+
+        // Retrieve the amount and ensure it's positive
+        $amount = abs($transaction->amount); // Ensure amount is always positive
+
+        // Create a new transaction entry for the refund
+        UserTransaction::create([
+            'user_id' => $validated['user_id'],
+            'team_id' => null,
+            'amount' => $amount, // Refund amount
+            'status' => 'COMPLETED',
+            'transaction_type' => 'credit',
+            'description' => "Refund the amount back to wallet",
+            'transaction_id' => Str::uuid(), // Generate a unique transaction ID
+        ]);
+
+        // Update the user's wallet balance
+        $userWallet = UserWallet::where('user_id', $validated['user_id'])->first();
+
+        if ($userWallet) {
+            $userWallet->balance += $amount; // Add the positive amount to the existing balance
+            $userWallet->save(); // Save the updated balance
+        } else {
+            return response()->json([
+                'status_code' => 2,
+                'message' => 'User wallet not found.',
+                'data' => [],
+            ]);
+        }
+
+        return response()->json([
+            'status_code' => 1,
+            'message' => 'Transaction status updated to REJECTED successfully, and amount refunded to wallet.',
             'data' => $transaction,
         ]);
     }
