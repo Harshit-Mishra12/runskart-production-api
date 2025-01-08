@@ -67,6 +67,8 @@ Route::prefix('v1')->group(function () {
 
             Route::post("/transactions/fetch", [TransactionController::class, 'getAllUserTransactions']);
             Route::post("/transactions/status/update", [TransactionController::class, 'updateTransactionStatus']);
+            Route::post("/transactions/status/reject", [TransactionController::class, 'rejectTransactionStatus']);
+
             //cricket api
             Route::post('/events/fetch-matches/external', [CricketExternalController::class, 'fetchMatches']);
             //dashboard
