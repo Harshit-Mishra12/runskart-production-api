@@ -12,9 +12,9 @@ class Helper
 {
     public static function getApiKey()
     {
-        // return 'c87ea341-cb2a-499d-bc06-388253b04c6d';
         // return 'c817d386-adb5-41de-b355-5153316adc8f';
-        return '5c308ca5-9f4a-4f3d-9831-f7fe11548395';
+        // return '5c308ca5-9f4a-4f3d-9831-f7fe11548395';
+        return '07a8a4f2-dbf7-47c6-9e61-777ad8bc1422';
     }
     public static function getRazorpayKeyId()
     {
